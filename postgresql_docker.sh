@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 
-docker rm openmind-db
-docker run --name openmind-db -e POSTGRES_PASSWORD=root -e POSTGRES_DB=openmind_db -p 5435:5432 -d postgres:13.1-alpine
+container_name=openmind-db
+port=5435
+password=root
+database=openmind_db
+
+docker kill $container_name
+docker rm $container_name
+docker run --name $container_name -e POSTGRES_PASSWORD=$password -e POSTGRES_DB=$database -p $port:5432 -d postgres:13.1-alpine
