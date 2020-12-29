@@ -1,0 +1,21 @@
+<!DOCTYPE hibernate-configuration PUPLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">root</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5435/openmind_db</property>
+
+        <property name="connection.pool_size">5</property>
+        <property name="hibernate.show_sql">false</property>
+        <property name="hbm2ddl.auto">update</property>
+
+        <mapping class="main.java.model.User" />
+        <mapping class="main.java.model.Category" />
+        <mapping class="main.java.model.Comment" />
+        <mapping class="main.java.model.Post" />
+        <mapping class="main.java.model." />
