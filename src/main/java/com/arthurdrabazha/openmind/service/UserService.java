@@ -1,5 +1,6 @@
 package com.arthurdrabazha.openmind.service;
 
+import com.arthurdrabazha.openmind.dto.ChangePasswordDto;
 import com.arthurdrabazha.openmind.dto.CreateUserDto;
 import com.arthurdrabazha.openmind.exception.UserNotFoundException;
 import com.arthurdrabazha.openmind.model.User;
@@ -17,9 +18,9 @@ public interface UserService {
 
     void deleteById(Long id);
 
-    void updatePassword(User user, Object passwordDto);
+    void updatePassword(User user, ChangePasswordDto passwordDto) throws Exception;
 
-    Boolean isPasswordWasUsed(String passwordDigest);
+    Boolean isPasswordWasUsed(User user, ChangePasswordDto changePasswordDto);
 
     Boolean isUsernameTaken(CreateUserDto createUserDto);
 

@@ -1,10 +1,12 @@
 package com.arthurdrabazha.openmind.service;
 
+import com.arthurdrabazha.openmind.dto.ChangePasswordDto;
 import com.arthurdrabazha.openmind.dto.CreateUserDto;
 import com.arthurdrabazha.openmind.dto.NonActivePeriod;
 import com.arthurdrabazha.openmind.exception.UserNotFoundException;
 import com.arthurdrabazha.openmind.model.User;
 import com.arthurdrabazha.openmind.repository.UserRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -66,18 +69,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updatePassword(User user, Object passwordDto) {
+    public void updatePassword(User user, ChangePasswordDto passwordDto) throws Exception {
 
+        if (!bCryptPasswordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
+            throw new Exception();
+        }
+
+        if (!StringUtils.equals(passwordDto.getNewPassword(), passwordDto.getNewPasswordRepeat())) {
+            throw new Exception();
+        }
+
+        if (isPasswordWasUsed(user, passwordDto)) {
+            throw new Exception();
+        }
+
+        User updatedUser = user.toBuilder()
+                .password(bCryptPasswordEncoder.encode(passwordDto.getNewPassword()))
+                .build();
+
+        userRepository.save(updatedUser);
     }
 
     @Override
-    public Boolean isPasswordWasUsed(String passwordDigest) {
-        return null;
+    public Boolean isPasswordWasUsed(User user, ChangePasswordDto changePasswordDto) {
+        return userRepository.findAllUsedPasswordsForUser( user.getId() )
+                .contains( bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()) );
     }
 
     @Override
     public Boolean isUsernameTaken(CreateUserDto createUserDto) {
-        return null;
+        return Objects.nonNull( userRepository.findUserByUsername( createUserDto.getUsername() ) );
     }
 
     @Override

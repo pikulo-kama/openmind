@@ -4,28 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Entity(name = "users")
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +44,13 @@ public class User {
     @Column(name = "password_digest")
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
     @Column(name = "delete_after_days")
     private Integer nonActiveDaysBeforeDelete;
+
+    private Boolean isEnabled;
 
     private Long likes;
 
@@ -70,8 +75,36 @@ public class User {
     @ManyToMany(mappedBy = "users")
     private List<Category> categories;
 
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private List<UserPassword> oldPasswords;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastLoginDate = this.lastLoginDate
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        long daysFromLastLogin = ChronoUnit.DAYS.between(now, lastLoginDate);
+
+        return daysFromLastLogin < nonActiveDaysBeforeDelete;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isEnabled;
+    }
 }
