@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,6 +53,11 @@ public class User {
 
     private Long dislikes;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
+    private Boolean isEnabled;
+
     @Column(name = "created_at")
     private Date createDate;
 
@@ -69,9 +76,5 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     private List<Category> categories;
-
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private List<UserPassword> oldPasswords;
 
 }
