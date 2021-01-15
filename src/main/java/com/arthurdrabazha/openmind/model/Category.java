@@ -47,5 +47,5 @@ public class Category {
             joinColumns = { @JoinColumn(name = "post_id") },
             inverseJoinColumns = { @JoinColumn(name = "category_id") }
     )
-    private List<User> posts;
+    private List<Post> posts;
 }
