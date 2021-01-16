@@ -120,7 +120,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <url>env.DB_URL</url>
+                    <url>${env.DB_URL}</url>
                 </configuration>
             </plugin>
         </plugins>
