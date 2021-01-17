@@ -9,14 +9,14 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findAllByAuthor(User author);
+    List<Post> findPostsByAuthorId(Long authorId);
 
     List<Post> findAllByCategoriesContains(Category category);
 
     List<Post> findAllByTopicContains(String topic);
 
-    List<Post> findPostsByDislikesNotNullOrderByLikesAsc();
+    List<Post> findAllByIdNotNullOrderByLikesAsc();
 
-    List<Post> findPostsByDislikesNotNullOrderByLikesDesc();
+    List<Post> findAllByIdNotNullOrderByLikesDesc();
 
 }
