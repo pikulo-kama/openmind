@@ -2,7 +2,6 @@ package com.arthurdrabazha.openmind.repository;
 
 import com.arthurdrabazha.openmind.model.Category;
 import com.arthurdrabazha.openmind.model.Post;
-import com.arthurdrabazha.openmind.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
