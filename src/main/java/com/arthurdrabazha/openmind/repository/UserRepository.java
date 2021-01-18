@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findUserByUsername(String username);
+    Optional<User> findUserByUsername(String username);
+
+    Boolean existsUserByUsername(String username);
 
     List<User> findUsersByCategoriesContains(Category categories);
 
@@ -25,5 +28,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "VALUES user_id=:id, old_password_digest=:password",
             nativeQuery = true)
 
-    void createUserUsedPassword(@Param("password") String passwordDigest, @Param("id") Long userId);
+    void storeOldPassword(@Param("password") String passwordDigest, @Param("id") Long userId);
 }
