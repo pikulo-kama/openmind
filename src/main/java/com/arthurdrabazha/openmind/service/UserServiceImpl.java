@@ -3,7 +3,6 @@ package com.arthurdrabazha.openmind.service;
 import com.arthurdrabazha.openmind.dto.CreateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserPasswordDto;
-import com.arthurdrabazha.openmind.exception.DatabaseLookupException;
 import com.arthurdrabazha.openmind.exception.ServiceException;
 import com.arthurdrabazha.openmind.model.Category;
 import com.arthurdrabazha.openmind.model.User;
@@ -43,9 +42,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Long id) throws DatabaseLookupException {
+    public User findById(Long id) throws ServiceException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new DatabaseLookupException("User with such id doesn't exist"));
+                .orElseThrow(() -> new ServiceException("User with such id doesn't exist"));
     }
 
     @Override
