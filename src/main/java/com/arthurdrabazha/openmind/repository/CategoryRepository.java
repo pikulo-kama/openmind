@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CategoryRepository extends JpaRepository<Category, Short> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query(value = "SELECT category_id FROM users_categories WHERE user_id=:userId", nativeQuery = true)
     List<Category> findAllByUsersContains(Long userId);
