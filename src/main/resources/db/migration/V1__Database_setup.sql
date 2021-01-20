@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS "users" (
   "birth_date" date,
   "password_digest" varchar,
   "delete_after_days" smallint,
-  "rate" decimal,
-  "times_rated" smallint,
+  "likes" bigint,
+  "dislikes" bigint,
   "created_at" date,
   "updated_at" timestamp,
   "last_login_at" timestamp
@@ -20,8 +20,9 @@ CREATE TABLE IF NOT EXISTS "user_passwords" (
 CREATE TABLE IF NOT EXISTS "posts" (
   "id" BIGSERIAL PRIMARY KEY,
   "author_id" bigint,
-  "rate" decimal,
-  "times_rated" smallint
+  "topic" varchar,
+  "likes" bigint,
+  "dislikes" bigint
 );
 
 CREATE TABLE IF NOT EXISTS "comments" (

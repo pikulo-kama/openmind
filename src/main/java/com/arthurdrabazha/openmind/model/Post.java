@@ -5,12 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -24,8 +27,8 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private User author;
+    @Column(name = "author_id")
+    private Long authorId;
 
     @NotBlank
     private String topic;
@@ -34,6 +37,11 @@ public class Post {
 
     private Long dislikes;
 
-    @ManyToMany(mappedBy = "posts")
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "posts_categories",
+            joinColumns = { @JoinColumn(name = "post_id") },
+            inverseJoinColumns = { @JoinColumn(name = "category_id")}
+    )
     private List<Category> categories;
 }

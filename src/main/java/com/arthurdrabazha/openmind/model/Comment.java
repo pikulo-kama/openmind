@@ -30,15 +30,3 @@ public class Comment {
     private Boolean isModified;
 }
 
-@Embeddable
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-class CommentID implements Serializable {
-
-    @ManyToOne
-    private User author;
-
-    @ManyToOne
-    private Post post;
-}
