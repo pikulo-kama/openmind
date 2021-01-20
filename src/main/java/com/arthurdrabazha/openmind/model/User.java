@@ -20,9 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,7 +32,7 @@ import java.util.List;
 
 @Entity(name = "users")
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
@@ -43,16 +41,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     private String username;
 
-    @Email
+    @NotNull
     private String email;
 
-    @Past
+    @NotNull
     private LocalDate birthDate;
 
-    @NotBlank
+    @NotNull
     @Column(name = "password_digest")
     private String password;
 

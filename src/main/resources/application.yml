@@ -11,4 +11,4 @@ spring:
         baseline-on-migrate: true
 
 user:
-    mininal_age: 16
+    minimal_age: 16
