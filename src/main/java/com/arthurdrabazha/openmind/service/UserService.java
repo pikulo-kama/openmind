@@ -3,7 +3,6 @@ package com.arthurdrabazha.openmind.service;
 import com.arthurdrabazha.openmind.dto.CreateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserPasswordDto;
-import com.arthurdrabazha.openmind.exception.DatabaseLookupException;
 import com.arthurdrabazha.openmind.model.Category;
 import com.arthurdrabazha.openmind.model.User;
 import com.arthurdrabazha.openmind.model.UserRole;
@@ -14,7 +13,7 @@ public interface UserService {
 
     List<User> findAll();
 
-    User findById(Long id) throws DatabaseLookupException;
+    User findById(Long id);
 
     User findByUsername(String username);
 
