@@ -10,3 +10,5 @@ spring:
         out-of-order: true
         baseline-on-migrate: true
 
+user:
+    mininal_age: 16
