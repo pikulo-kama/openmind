@@ -10,7 +10,8 @@ public enum DeletePeriod {
     THREE_MONTH("Three month", 90),
     SIX_MONTH("Six month", 180),
     ONE_YEAR("One year", 364),
-    NEVER("Never", Integer.MAX_VALUE);
+    NEVER("Never", (int) Short.MAX_VALUE);
+
 
     private String verboseName;
     private Integer numericalValue;

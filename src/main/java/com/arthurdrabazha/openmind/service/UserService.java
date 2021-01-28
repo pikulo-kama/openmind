@@ -19,7 +19,7 @@ public interface UserService {
 
     List<User> findByCategory(Category category);
 
-    void create(CreateUserDto createUserDto, UserRole userRole);
+    void create(CreateUserDto createUserDto);
 
     User update(User user, UpdateUserDto updateUserDto);
 
@@ -30,5 +30,7 @@ public interface UserService {
     void activate(Long userId);
 
     void deactivate(Long userId);
+
+    Boolean isLastAdmin();
 
 }

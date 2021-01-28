@@ -4,34 +4,42 @@ import com.arthurdrabazha.openmind.dto.CreateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserPasswordDto;
 import com.arthurdrabazha.openmind.exception.ServiceException;
+import com.arthurdrabazha.openmind.exception.UserNotFoundException;
 import com.arthurdrabazha.openmind.model.Category;
 import com.arthurdrabazha.openmind.model.User;
 import com.arthurdrabazha.openmind.model.UserRole;
 import com.arthurdrabazha.openmind.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Value("${user.minimal_age}")
     private Integer MINIMUM_USER_AGE;
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+
+//    @Qualifier("bCryptEncoder")
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -42,15 +50,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Long id) throws ServiceException {
+    public User findById(Long id) throws UsernameNotFoundException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ServiceException("User with such id doesn't exist"));
+                .orElseThrow(() -> new UserNotFoundException("User with such id doesn't exist"));
     }
 
     @Override
     public User findByUsername(String username) {
         return userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User with such username doesn't exist"));
+                .orElseThrow(() -> new UserNotFoundException("User with such username doesn't exist"));
     }
 
     @Override
@@ -60,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void create(CreateUserDto createUserDto, UserRole role) {
+    public void create(CreateUserDto createUserDto) {
 
         if (userRepository.existsUserByUsername(createUserDto.getUsername())) {
             throw new ServiceException("User with this username already exists");
@@ -76,12 +84,11 @@ public class UserServiceImpl implements UserService {
 
         User newUser = User.builder()
                 .username(createUserDto.getUsername())
-                .role(role)
+                .role(createUserDto.getRole())
                 .email(createUserDto.getEmail())
                 .password(passwordEncoder.encode(createUserDto.getPassword()))
-                .birthDate(createUserDto.getBirthDate().toLocalDate())
-                .createDate(Timestamp.valueOf(LocalDateTime.now()))
-                .updateDate(Timestamp.valueOf(LocalDateTime.now()))
+                .birthDate(createUserDto.getBirthDate())
+                .lastLoginDate(Timestamp.valueOf(LocalDateTime.now()))
                 .likes(0L)
                 .dislikes(0L)
                 .isEnabled(Boolean.TRUE)
@@ -111,9 +118,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!user.isEnabled()) {
+        if (user.isEnabled()) {
             throw new ServiceException("User should be disabled, in order to delete him");
         }
 
@@ -152,7 +159,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void activate(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (user.getRole() == UserRole.ROLE_ADMIN) {
             throw new ServiceException("Permission denied! Attempt to deactivate administrator account");
@@ -164,9 +171,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deactivate(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         setAccountStatus(user, Boolean.FALSE);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
     private void setAccountStatus(User user, Boolean status) {
@@ -184,10 +197,20 @@ public class UserServiceImpl implements UserService {
         return passwords.contains(password);
     }
 
-    private boolean ageNotValid(LocalDateTime birthDate) {
-        long age = ChronoUnit.YEARS.between(LocalDateTime.now(), birthDate);
+    private Boolean ageNotValid(LocalDate birthDate) {
+        long age = ChronoUnit.YEARS.between(birthDate, LocalDate.now());
 
         return age < MINIMUM_USER_AGE;
     }
 
+    @Override
+    public Boolean isLastAdmin() {
+        List<User> users = userRepository.findAll();
+
+        long count = users.stream()
+                .filter(user -> user.getRole() == UserRole.ROLE_ADMIN)
+                .count();
+
+        return count == 1;
+    }
 }
