@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity(name = "comments")
 @Data
@@ -22,6 +23,7 @@ public class Comment {
     @NotBlank
     private String message;
 
+    @NotNull
     private Boolean isModified;
 }
 

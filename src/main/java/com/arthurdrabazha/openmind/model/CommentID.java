@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Embeddable
@@ -14,8 +16,9 @@ import java.io.Serializable;
 @Data
 public class CommentID implements Serializable {
 
-    @ManyToOne
-    private User author;
+    @Column(name = "author_id")
+    @NotNull
+    private Long author_id;
 
     @ManyToOne
     private Post post;
