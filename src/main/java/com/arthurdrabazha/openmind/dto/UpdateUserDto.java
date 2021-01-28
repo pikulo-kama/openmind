@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -14,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 public class UpdateUserDto {
 
-    @NotNull(message = "Username should be set")
-    @Pattern(regexp = "/[0-9a-z\\-]{2,25}/",
+    @NotBlank(message = "Username should be set")
+    @Pattern(regexp = "^[0-9a-z\\-]{2,25}$",
             message = "Username can only contain digits, lower case letters and dash symbol")
     private String username;
 
