@@ -1,0 +1,1 @@
+<a href="/u/">List users</a>
