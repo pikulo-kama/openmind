@@ -16,50 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
-
-        <db.url>jdbc:postgresql://localhost:5435/openmind_db</db.url>
-        <db.username>postgres</db.username>
-        <db.password>root</db.password>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>url-defined</id>
-            <activation>
-                <property>
-                    <name>env.DB_URL</name>
-                </property>
-            </activation>
-            <properties>
-                <db.url>${env.DB_URL}</db.url>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>password-defined</id>
-            <activation>
-                <property>
-                    <name>env.DB_PASSWORD</name>
-                </property>
-            </activation>
-            <properties>
-                <db.password>${env.DB_PASSWORD}</db.password>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>username-defined</id>
-            <activation>
-                <property>
-                    <name>env.DB_USERNAME</name>
-                </property>
-            </activation>
-            <properties>
-                <db.username>${env.DB_USERNAME}</db.username>
-            </properties>
-        </profile>
-    </profiles>
-
 
     <dependencies>
         <dependency>
@@ -169,12 +126,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <url>${db.url}</url>
-                    <user>${db.username}</user>
-                    <password>${db.password}</password>
+                    <url>${env.DB_URL}</url>
+                    <user>${env.DB_USERNAME}</user>
+                    <password>${env.DB_PASSWORD}</password>
                     <driver>org.postgresql.Driver</driver>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
