@@ -18,7 +18,7 @@ public class CommentID implements Serializable {
 
     @Column(name = "author_id")
     @NotNull
-    private Long author_id;
+    private Long authorId;
 
     @ManyToOne
     private Post post;

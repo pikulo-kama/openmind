@@ -33,4 +33,6 @@ public interface UserService {
 
     Boolean isLastAdmin();
 
+    CreateUserDto validateCreateUserDto(User sessionUser, CreateUserDto createUserDto);
+
 }

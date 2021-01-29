@@ -23,9 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-
 
 @Controller
 @RequestMapping("/u")
@@ -48,7 +45,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public String getOne(@AuthenticationPrincipal User sessionUser, @PathVariable(value = "id") Long id, Model model) {
+    public String getOne(@AuthenticationPrincipal User sessionUser, @PathVariable("id") Long id, Model model) {
 
         User user = userService.findById(id);
 
@@ -61,8 +58,8 @@ public class UserController {
     @GetMapping("/account")
     public String getAccountPage(@AuthenticationPrincipal User user, Model model) {
 
-        User persistedUser = userService.findById(user.getId());
-        model.addAttribute("user", persistedUser);
+        User persistentUser = userService.findById(user.getId());
+        model.addAttribute("user", persistentUser);
 
         return "/users/index";
     }
@@ -122,20 +119,10 @@ public class UserController {
     public String createUser(@Nullable @AuthenticationPrincipal User user,
                                 @Validated CreateUserDto createUserDto, RedirectAttributes redirectAttributes) {
 
-        // Should I place following logic in service?
-
-        if (nonNull(user))
-            if (user.getRole() != UserRole.ROLE_ADMIN && createUserDto.getRole() == UserRole.ROLE_ADMIN) {
-                throw new ServiceException("You don't have permissions to create admin account");
-            }
-
-        if (isNull(user))
-            createUserDto.setRole(UserRole.ROLE_USER);
-
+        createUserDto = userService.validateCreateUserDto(user, createUserDto);
         userService.create(createUserDto);
 
         redirectAttributes.addFlashAttribute("message", "User created");
-
         return "redirect:/login";
     }
 
@@ -150,6 +137,7 @@ public class UserController {
 
     @PostMapping("/deactivate/{id}")
     public String deactivate(@PathVariable(value = "id") Long id, RedirectAttributes redirectAttributes) {
+
         userService.deactivate(id);
 
         redirectAttributes.addFlashAttribute("message", "User deactivated");
