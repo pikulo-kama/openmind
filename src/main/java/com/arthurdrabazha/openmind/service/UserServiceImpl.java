@@ -1,6 +1,7 @@
 package com.arthurdrabazha.openmind.service;
 
 import com.arthurdrabazha.openmind.dto.CreateUserDto;
+import com.arthurdrabazha.openmind.dto.DeletePeriod;
 import com.arthurdrabazha.openmind.dto.UpdateUserDto;
 import com.arthurdrabazha.openmind.dto.UpdateUserPasswordDto;
 import com.arthurdrabazha.openmind.exception.ServiceException;
@@ -27,15 +28,23 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService, UserDetailsService, AdminUserInitializer {
 
     @Value("${user.minimal_age}")
     private Integer MINIMUM_USER_AGE;
 
+    @Value("${admin.username}")
+    private String ADMIN_USERNAME;
+
+    @Value("${admin.password}")
+    private String ADMIN_PASSWORD;
+
     private final UserRepository userRepository;
 
-//    @Qualifier("bCryptEncoder")
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -66,7 +75,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findUsersByCategoriesContains(category);
     }
 
-    @Transactional
     @Override
     public void create(CreateUserDto createUserDto) {
 
@@ -99,7 +107,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(newUser);
     }
 
-    @Transactional
     @Override
     public User update(User user, UpdateUserDto updateUserDto) {
 
@@ -114,7 +121,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return updatedUser;
     }
 
-    @Transactional
     @Override
     public void delete(Long userId) {
         User user = userRepository.findById(userId)
@@ -161,10 +167,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (user.getRole() == UserRole.ROLE_ADMIN) {
-            throw new ServiceException("Permission denied! Attempt to deactivate administrator account");
-        }
-
         setAccountStatus(user, Boolean.TRUE);
     }
 
@@ -172,6 +174,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void deactivate(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (user.getRole() == UserRole.ROLE_ADMIN && isLastAdmin()) {
+            throw new ServiceException("You can't deactivate last admin");
+        }
 
         setAccountStatus(user, Boolean.FALSE);
     }
@@ -205,12 +211,51 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Boolean isLastAdmin() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllByRole(UserRole.ROLE_ADMIN);
 
-        long count = users.stream()
-                .filter(user -> user.getRole() == UserRole.ROLE_ADMIN)
-                .count();
+        if (!users.isEmpty()) {
+            return users.size() == 1;
+        }
 
-        return count == 1;
+        return false;
+    }
+
+    @Override
+    public CreateUserDto validateCreateUserDto(User sessionUser, CreateUserDto createUserDto) {
+
+        if (nonNull(sessionUser)) {
+            if (sessionUser.getRole() != UserRole.ROLE_ADMIN && createUserDto.getRole() == UserRole.ROLE_ADMIN) {
+                throw new ServiceException("You don't have permissions to create admin account");
+            }
+        }
+
+        if (isNull(sessionUser)) {
+            createUserDto.setRole(UserRole.ROLE_USER);
+        }
+
+        return createUserDto;
+    }
+
+    @Override
+    public void createAdminIfNotExists() {
+
+        List<User> admins = userRepository.findAllByRole(UserRole.ROLE_ADMIN);
+
+        if (admins.isEmpty()) {
+            User admin = User.builder()
+                    .username(ADMIN_USERNAME)
+                    .role(UserRole.ROLE_ADMIN)
+                    .email("email@mail.com")
+                    .password(passwordEncoder.encode(ADMIN_PASSWORD))
+                    .birthDate(LocalDate.now())
+                    .lastLoginDate(Timestamp.valueOf(LocalDateTime.now()))
+                    .likes(0L)
+                    .dislikes(0L)
+                    .isEnabled(Boolean.TRUE)
+                    .nonActiveDaysBeforeDelete(DeletePeriod.NEVER.getNumericalValue())
+                    .build();
+
+            userRepository.save(admin);
+        }
     }
 }
