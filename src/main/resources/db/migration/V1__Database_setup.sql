@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "comments" (
   "post_id" bigint,
   "author_id" bigint,
   "message" varchar,
-  "modified_at" timestamp
+  "is_modified" bit
 );
 
 CREATE TABLE IF NOT EXISTS "categories" (

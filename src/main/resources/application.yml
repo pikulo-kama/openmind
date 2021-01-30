@@ -10,3 +10,9 @@ spring:
         out-of-order: true
         baseline-on-migrate: true
 
+user:
+    minimal_age: 16
+
+admin:
+    username: admin
+    password: admin

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,9 +22,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,7 +35,7 @@ import java.util.List;
 
 @Entity(name = "users")
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
@@ -43,16 +44,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     private String username;
 
-    @Email
+    @NotNull
     private String email;
 
-    @Past
+    @NotNull
     private LocalDate birthDate;
 
-    @NotBlank
+    @NotNull
     @Column(name = "password_digest")
     private String password;
 
@@ -69,10 +70,12 @@ public class User implements UserDetails {
     private Boolean isEnabled;
 
     @Column(name = "created_at")
-    private Date createDate;
+    @CreationTimestamp
+    private Timestamp createDate;
 
     @Column(name = "updated_at")
-    private Date updateDate;
+    @UpdateTimestamp
+    private Timestamp updateDate;
 
     @Column(name = "last_login_at")
     private Date lastLoginDate;

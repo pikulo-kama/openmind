@@ -2,15 +2,21 @@ package com.arthurdrabazha.openmind.repository;
 
 import com.arthurdrabazha.openmind.model.Category;
 import com.arthurdrabazha.openmind.model.User;
+import com.arthurdrabazha.openmind.model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findUserByUsername(String username);
+    Optional<User> findUserByUsername(String username);
+
+    List<User> findAllByRole(UserRole role);
+
+    Boolean existsUserByUsername(String username);
 
     List<User> findUsersByCategoriesContains(Category categories);
 
@@ -21,9 +27,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<String> findAllUsedPasswordsForUser(Long id);
 
-    @Query(value = "INSERT INTO user_passwords (user_id, old_password_digest)" +
-            "VALUES user_id=:id, old_password_digest=:password",
+    @Modifying
+    @Query(value = "INSERT INTO user_passwords (user_id, old_password_digest) VALUES (:id, :password)",
             nativeQuery = true)
-
-    void createUserUsedPassword(@Param("password") String passwordDigest, @Param("id") Long userId);
+    void storeOldPassword(String password, Long id);
 }

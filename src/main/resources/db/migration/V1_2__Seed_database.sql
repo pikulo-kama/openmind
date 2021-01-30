@@ -1,8 +1,9 @@
 INSERT INTO users (username, email, birth_date, password_digest,
-                   delete_after_days, likes, dislikes, created_at, updated_at) VALUES
-    ('ajerigoju', 'jfjf@fdf.com', '2001-03-12', 'pass', 30, 230, 124, '2001-05-12', '2001-05-12'),
-    ('pumba', 'jfjfwerw@fdf.com', '2001-03-12', 'pass', 30, 23, 124, '2001-05-12', '2001-05-12'),
-    ('shuriken', 'showup@fdf.com', '2001-03-12', 'pass', 30, 230, 124, '2001-05-12', '2001-05-12');
+                   delete_after_days, likes, dislikes, created_at,
+                   updated_at, last_login_at) VALUES
+    ('ajerigoju', 'jfjf@fdf.com', '2001-03-12', '$2y$12$bUMDHLSx.p6jNgpXXUH/hOjcOAOgL4aUUB8GOi3iCBeLaVUjUhB8a', 30, 230, 124, '2001-05-12', '2001-05-12', '2001-05-12'),
+    ('pumba', 'jfjfwerw@fdf.com', '2001-03-12', '$2y$12$bUMDHLSx.p6jNgpXXUH/hOjcOAOgL4aUUB8GOi3iCBeLaVUjUhB8a', 30, 23, 124, '2001-05-12', '2001-05-12', '2001-05-12'),
+    ('shuriken', 'showup@fdf.com', '2001-03-12', '$2y$12$bUMDHLSx.p6jNgpXXUH/hOjcOAOgL4aUUB8GOi3iCBeLaVUjUhB8a', 30, 230, 124, '2001-05-12', '2001-05-12', '2001-05-12');
 
 
 INSERT INTO posts  (author_id, topic, likes, dislikes) VALUES
